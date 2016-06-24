@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'commander/import'
+require 'tsm'
+
+program :name, 'tsm.rb'
+program :version, '0.0.1'
+program :description, 'Call the TSM Gem'
+
+command :query do |c|
+  c.syntax = 'tsm.rb query [options]'
+  c.summary = 'Query TSM'
+  c.description = 'Query an IBM TSM instance for information.'
+  c.example 'description', './tsm.rb query --server <server> --user <user> --port <port> <tsm command>'
+  c.option '--server SERVER', String, 'The TSM server IP or FQDN.'
+  c.option '--user USER', String, 'TSM admin user.'
+  c.option '--password PASSWORD', String, 'TSM server password for user'
+  c.option '--port PORT', Integer, 'TSM Server Port'
+  c.action do |args, options|
+    # Do something or c.when_called Tsm.rb::Commands::Query
+    password "Password: " if options.password.nil?
+    cmd = TsmCommand.new([ 
+      [:node,'q node'],
+      [:db,'q db'],
+      [:log,'q log'],
+    ])
+    cmd.run_commands
+    output = cmd.output
+    ask_editor output
+  end
+end
+
