@@ -8,31 +8,34 @@ class TsmCommand
   class TsmCommandError < Exception; end
 
   attr_accessor :commands, :output
-  
-  def initialize(cmds="")
+
+  def initialize(*cmds)
 
     # For dsmadmc we need a log we can write to
     ENV["DSM_LOG"] = ENV["HOME"]
-    
+
     # Setup a log
     @log = Logger.new(STDOUT)
-    
+
     # Store the commands
     @commands = cmds
 
     # The main TSM command
-    @tsmcli = %w[dsmadmc -dataonly=yes -display=list -id=admin -pa=admin -se=tsm]
+    @tsmcli = %w[dsmadmc -dataonly=yes -display=list -id=admin -pa=admin -se=gem]
 
-    # Put all commands here to return 
+    # Put all commands here to return
     @output = {}
 
+  end
+
+  def tsmcli
+    return @tsmcli.join(' ')
   end
 
   def run_commands
     threads = []
     @commands.each do |val|
-      key = val[0]
-      cmd = val[1]
+      key, cmd = val.split(" ",2)
       @log.info("key=#{key}, cmd=#{cmd}")
       tsmexec = "#{@tsmcli.join(" ")} '#{cmd}' "
       threads << Thread.new do
@@ -50,8 +53,8 @@ class TsmCommand
     ret = {}
     @output.each_key do |key|
       ret[key] ||= []
-      @output[key].each do |k,v| 
-        v.each_index do |x| 
+      @output[key].each do |k,v|
+        v.each_index do |x|
           ret[key][x] ||= {}
           ret[key][x].store(k,v[x])
         end
@@ -59,7 +62,7 @@ class TsmCommand
     end
     return ret
   end
-  
+
   # Function to run the TSM command to system and capture the output
   # Returns a has hash[column] = [Array] of values
   def run_cmd(cmd)
@@ -85,5 +88,5 @@ class TsmCommand
     end
     return output
   end
-  
+
 end
