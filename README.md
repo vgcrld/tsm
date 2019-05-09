@@ -18,12 +18,15 @@ A TsmCmd is returned:
 # Other Tsm::Server Options
 
 What file are we writing to:
+
 `serv.output`
 
 Re-create the output file to clear used space:
+
 `serv.reinit`
 
 Exit and cleanup:
+
 `serv.quit`
 
 
